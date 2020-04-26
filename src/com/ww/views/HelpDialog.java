@@ -61,7 +61,8 @@ public class HelpDialog extends JDialog {
 		contentPanel.setLayout(null);
 		{
 			JLabel lblNewLabel = new JLabel("ImpressShowRunner");
-			lblNewLabel.setBounds(101, 10, 183, 25);
+			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			lblNewLabel.setBounds(55, 10, 332, 25);
 			lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 			contentPanel.add(lblNewLabel);
 		}
@@ -69,7 +70,7 @@ public class HelpDialog extends JDialog {
 			JLabel lblNewLabel_1 = new JLabel("Version 2.0");
 			lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 			lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-			lblNewLabel_1.setBounds(142, 49, 109, 13);
+			lblNewLabel_1.setBounds(119, 49, 178, 13);
 			contentPanel.add(lblNewLabel_1);
 		}
 		
