@@ -77,14 +77,14 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		//
 		public void setStatus( String sts ) {
 			
-			lblStatusLine.setText( sts );
+			lblStatus.setText( sts );
 		}
 
 		/*
 		 * usually means that everything worked up to now
 		*/
 		public boolean isStatusEmpty() {
-			return lblStatusLine.getText().isEmpty();
+			return lblStatus.getText().isEmpty();
 		}
 		
 		private boolean isOsWindows()
@@ -121,6 +121,9 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	 */
 	public ShowRunnerEvents() {
 		printSysOut("ShowRunnerEvents constructor reached");
+		
+		// build the main dialog
+		super.initialize();
 		
 		bTimerRunning = false;
 		bShowRunning = false;

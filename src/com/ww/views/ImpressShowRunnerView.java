@@ -48,7 +48,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 	protected JTextField tfImpressPath;
 	protected JTextField tfOptions;
 	protected JTextField tfShowPath;
-	protected JLabel lblStatusLine;
+	protected JLabel lblStatus;
 	protected JCheckBox ckbxBeepOnEnd;
 	protected JSpinner spSecondsBetweenShows;
 	
@@ -98,7 +98,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	protected void initialize() {
 		frmGuiGroupLayout = new JFrame();
 		frmGuiGroupLayout.getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 16));
 		frmGuiGroupLayout.setMinimumSize(new Dimension(580, 580));
@@ -200,7 +200,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 		spnSecsBetweenShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		spnSecsBetweenShows.setModel(new SpinnerNumberModel(5, 5, 99, 5));
 		
-		JLabel lblStatus = new JLabel("status");
+		lblStatus = new JLabel("status");
 		lblStatus.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GroupLayout groupLayout = new GroupLayout(frmGuiGroupLayout.getContentPane());
 		groupLayout.setHorizontalGroup(
