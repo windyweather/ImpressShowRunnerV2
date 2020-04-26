@@ -3,15 +3,18 @@ package com.ww.views;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import java.awt.List;
@@ -22,19 +25,38 @@ import java.awt.Dimension;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import java.awt.Font;
+import javax.swing.JFrame;
 
-public class ImpressShowRunnerView {
+public abstract class ImpressShowRunnerView extends JFrame implements ActionListener{
 
-	private JFrame frmGuiGroupLayout;
-	private JTextField tfImpressPath;
-	private JTextField tfOptions;
-	private JTextField tfShowPath;
+	// get rid of a warning about serialization.
+	private static final long serialVersionUID = 19837502L;
+	
+	//private JPanel contentPane;
+	
+	protected JScrollPane scrollPaneShows;
+	// Create the showList and listShows up here so we have some more control
+	// and can access these from the child class more easily
+	// very nice that this change does not mess up parsing by window builder
+	protected DefaultListModel<String>showList = new DefaultListModel<String>();
+	protected JList<String> listShows = new JList<String>(showList);
+	
+	protected JFrame frmGuiGroupLayout;
+	protected JTextField tfImpressPath;
+	protected JTextField tfOptions;
+	protected JTextField tfShowPath;
+	protected JLabel lblStatusLine;
+	protected JCheckBox ckbxBeepOnEnd;
+	protected JSpinner spSecondsBetweenShows;
+	
 
 	/**
 	 * Launch the application.
 	 */
+	/*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -47,7 +69,25 @@ public class ImpressShowRunnerView {
 			}
 		});
 	}
+	/*
 
+	
+	
+	// we will overload this in the child class
+	// use the same one for every action
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String actionCommand = e.getActionCommand();
+	    System.out.println( "FirstWbGui::actionPerformed "+actionCommand );
+	}
+	
+	// catch window closing with our own method
+	// this is overridden in the child to save stuff before exit
+	public void windowClosingEvent(WindowEvent e) {
+		System.out.println( "FirstWbGui windowClosing" );
+	}
+	
+	
 	/**
 	 * Create the application.
 	 */
@@ -67,6 +107,8 @@ public class ImpressShowRunnerView {
 		frmGuiGroupLayout.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JButton btnClose = new JButton("Close");
+		btnClose.setActionCommand("btnClose");
+		btnClose.addActionListener(this);
 		btnClose.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		tfImpressPath = new JTextField();
@@ -77,9 +119,13 @@ public class ImpressShowRunnerView {
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		
 		JButton btnBrowseForImpress = new JButton("...");
+		btnBrowseForImpress.setActionCommand("btnBrowseForImpress");
+		btnBrowseForImpress.addActionListener(this);
 		btnBrowseForImpress.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnAddShow = new JButton("Add Show");
+		btnAddShow.setActionCommand("btnAddShow");
+		btnAddShow.addActionListener(this);
 		btnAddShow.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JLabel lblOptions = new JLabel("Options");
@@ -98,37 +144,49 @@ public class ImpressShowRunnerView {
 		tfShowPath.setColumns(10);
 		
 		JButton btnBrowseForShow = new JButton("...");
+		btnBrowseForShow.setActionCommand("btnBrowseForShow");
+		btnBrowseForShow.addActionListener(this);
 		btnBrowseForShow.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JLabel lblListOfShows = new JLabel("List of Shows");
 		lblListOfShows.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		
 		JButton btnTop = new JButton("Top");
+		btnTop.setActionCommand("btnTop");
+		btnTop.addActionListener(this);
 		btnTop.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnUp = new JButton("Up");
+		btnUp.setActionCommand("btnUp");
+		btnUp.addActionListener(this);
 		btnUp.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnDown = new JButton("Down");
+		btnDown.setActionCommand("btnDown");
+		btnDown.addActionListener(this);
 		btnDown.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnDown.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		
 		JButton btnRemoveSelected = new JButton("Remove Selected");
+		btnRemoveSelected.setActionCommand("btnRemoveSelected");
+		btnRemoveSelected.addActionListener(this);
 		btnRemoveSelected.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnRemoveAll = new JButton("Remove All");
+		btnRemoveAll.setActionCommand("btnRemoveAll");
+		btnRemoveAll.addActionListener(this);
 		btnRemoveAll.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
-		JScrollPane scrollPaneShows = new JScrollPane();
+		scrollPaneShows = new JScrollPane();
 		scrollPaneShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnStopShows = new JButton("Stop Shows");
+		btnStopShows.setActionCommand("btnStopShows");
+		btnStopShows.addActionListener(this);
 		btnStopShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JButton btnStartShows = new JButton("Start Shows");
+		btnStartShows.setActionCommand("btnStartShows");
+		btnStartShows.addActionListener(this);
 		btnStartShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JCheckBox ckbxBeepAtEnd = new JCheckBox("Beep on End");
@@ -266,21 +324,29 @@ public class ImpressShowRunnerView {
 		menuBar.add(mnFileMenu);
 		
 		JMenuItem mntmOpenShowList = new JMenuItem("Open Show List...");
+		mntmOpenShowList.setActionCommand("mntmOpenShowList");
+		mntmOpenShowList.addActionListener(this);
 		mntmOpenShowList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnFileMenu.add(mntmOpenShowList);
 		
 		JMenuItem mntmSaveShowList = new JMenuItem("Save Show List...");
+		mntmSaveShowList.setActionCommand("mntmSaveShowList");
+		mntmSaveShowList.addActionListener(this);
 		mntmSaveShowList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnFileMenu.add(mntmSaveShowList);
 		
 		JSeparator separator = new JSeparator();
 		mnFileMenu.add(separator);
 		
-		JMenuItem mntmNewMenuItem = new JMenuItem("Save Defaults");
-		mntmNewMenuItem.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		mnFileMenu.add(mntmNewMenuItem);
+		JMenuItem mntmSaveDefaults = new JMenuItem("Save Defaults");
+		mntmSaveDefaults.setActionCommand("mntmSaveDefaults");
+		mntmSaveDefaults.addActionListener(this);
+		mntmSaveDefaults.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		mnFileMenu.add(mntmSaveDefaults);
 		
 		JMenuItem mntmRestoreDefaults = new JMenuItem("Restore Defaults");
+		mntmRestoreDefaults.setActionCommand("mntmRestoreDefaults");
+		mntmRestoreDefaults.addActionListener(this);
 		mntmRestoreDefaults.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnFileMenu.add(mntmRestoreDefaults);
 		
@@ -288,6 +354,8 @@ public class ImpressShowRunnerView {
 		mnFileMenu.add(separator_1);
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.setActionCommand("mntmQuit");
+		mntmQuit.addActionListener(this);
 		mntmQuit.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnFileMenu.add(mntmQuit);
 		
@@ -296,6 +364,8 @@ public class ImpressShowRunnerView {
 		menuBar.add(mnHelpMenu);
 		
 		JMenuItem mntmAbout = new JMenuItem("About...");
+		mntmAbout.setActionCommand("mntmAbout");
+		mntmAbout.addActionListener(this);
 		mntmAbout.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnHelpMenu.add(mntmAbout);
 	}
