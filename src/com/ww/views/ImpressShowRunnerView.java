@@ -14,10 +14,13 @@ import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import java.awt.List;
+import java.awt.Window;
+
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -44,7 +47,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 	protected DefaultListModel<String>showList = new DefaultListModel<String>();
 	protected JList<String> listShows = new JList<String>(showList);
 	
-	protected JFrame frmGuiGroupLayout;
+	public JFrame frmGuiGroupLayout;
 	protected JTextField tfImpressPath;
 	protected JTextField tfOptions;
 	protected JTextField tfShowPath;
@@ -70,7 +73,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 		});
 	}
 	/*
-
+*/
 	
 	
 	// we will overload this in the child class
@@ -93,6 +96,16 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 	 */
 	public ImpressShowRunnerView() {
 		initialize();
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// Find ourselves in the great beyond
+				ImpressShowRunnerView win = (ImpressShowRunnerView)e.getWindow();
+				win.windowClosingEvent(e); // call us, which will call our child too
+			}
+		});
+		
 	}
 
 	/**
@@ -105,6 +118,8 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 		frmGuiGroupLayout.setTitle("ImpressShowRunner");
 		frmGuiGroupLayout.setBounds(100, 100, 620, 589);
 		frmGuiGroupLayout.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+
 		
 		JButton btnClose = new JButton("Close");
 		btnClose.setActionCommand("btnClose");
@@ -189,16 +204,16 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 		btnStartShows.addActionListener(this);
 		btnStartShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
-		JCheckBox ckbxBeepAtEnd = new JCheckBox("Beep on End");
-		ckbxBeepAtEnd.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		ckbxBeepOnEnd = new JCheckBox("Beep on End");
+		ckbxBeepOnEnd.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		JLabel lblNewLabel_1 = new JLabel("Delay in Secs");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		
-		JSpinner spnSecsBetweenShows = new JSpinner();
-		spnSecsBetweenShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		spnSecsBetweenShows.setModel(new SpinnerNumberModel(5, 5, 99, 5));
+		spSecondsBetweenShows = new JSpinner();
+		spSecondsBetweenShows.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		spSecondsBetweenShows.setModel(new SpinnerNumberModel(5, 5, 99, 5));
 		
 		lblStatus = new JLabel("status");
 		lblStatus.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -210,11 +225,11 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrollPaneShows, GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(ckbxBeepAtEnd)
+							.addComponent(ckbxBeepOnEnd)
 							.addGap(18)
 							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
-							.addComponent(spnSecsBetweenShows, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(spSecondsBetweenShows, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addGap(35)
 							.addComponent(btnStartShows)
 							.addGap(15)
@@ -300,9 +315,9 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 					.addGap(10)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnStartShows)
-						.addComponent(ckbxBeepAtEnd)
+						.addComponent(ckbxBeepOnEnd)
 						.addComponent(lblNewLabel_1)
-						.addComponent(spnSecsBetweenShows, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(spSecondsBetweenShows, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnStopShows))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
@@ -311,7 +326,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 					.addGap(23))
 		);
 		
-		List listShows = new List();
+		//listShows = new JList<String>(showList);
 		scrollPaneShows.setViewportView(listShows);
 		frmGuiGroupLayout.getContentPane().setLayout(groupLayout);
 		

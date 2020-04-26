@@ -49,6 +49,7 @@ public class HelpDialog extends JDialog {
 	public HelpDialog(  JFrame mf, String title, boolean modal) {
 		// call super and force modal
 		super(mf, title, true);
+		setResizable(false);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setFont(new Font("Dialog", Font.PLAIN, 16));
 		
@@ -65,7 +66,7 @@ public class HelpDialog extends JDialog {
 			contentPanel.add(lblNewLabel);
 		}
 		{
-			JLabel lblNewLabel_1 = new JLabel("Version 1.0");
+			JLabel lblNewLabel_1 = new JLabel("Version 2.0");
 			lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 			lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
 			lblNewLabel_1.setBounds(142, 49, 109, 13);
@@ -81,7 +82,7 @@ public class HelpDialog extends JDialog {
 		scrollPane.setViewportView(txtHelp);
 
 		txtHelp.setEditable(false);
-		txtHelp.setText("ImpressShowRunner is a program to chain together multiple LibreOffice impress slide shows.\r\n\r\nEach show in the sequence is set under Slide Settings so that mouse clicks do not advance the slides. This is important. ImpressShowRunner launches each show in the sequence and then clicks the mouse every few seconds and when the last black screen is shown, the mouse click terminates the show and Impress exits. ImpressShowRunner notices the process exit and then starts the next show. When the last show ends, ImpressShowRunner just starts the list again.\r\n\r\nThis complicated process gets around the fact that LibreOffice Impress apparently has no options or scripting features available to accomplish chaining and looping of multiple slide shows together.\r\n\r\nThe reason for wanting to chain multiple shows is that after 100 or so slides with images the save times and editing for shows becomes cumbersome. This is quite reasonable for at this point the show file size may become 100MB or more.\r\n\r\nFeatures\r\n\r\n    Launches Impress Slide Shows\r\n    Plays a sequence of slide shows\r\n    Loops the list\r\n    Requires no interaction between shows\r\n\r\nReleased under GPL 3.0\r\nDarrell Duffy\r\nApril 2020");
+		txtHelp.setText("ImpressShowRunner is a program to chain together multiple LibreOffice impress slide shows.\r\n\r\nEach show in the sequence is set under Slide Settings so that mouse clicks do not advance the slides. This is important. ImpressShowRunner launches each show in the sequence and then clicks the mouse every few seconds and when the last black screen is shown, the mouse click terminates the show and Impress exits. ImpressShowRunner notices the process exit and then starts the next show. When the last show ends, ImpressShowRunner just starts the list again.\r\n\r\nThis complicated process gets around the fact that LibreOffice Impress apparently has no options or scripting features available to accomplish chaining and looping of multiple slide shows together.\r\n\r\nThe reason for wanting to chain multiple shows is that after 100 or so slides with images the save times and editing for shows becomes cumbersome. This is quite reasonable for at this point the show file size may become 100MB or more.\r\n\r\nFeatures\r\n\r\n    Launches Impress Slide Shows\r\n    Plays a sequence of slide shows\r\n    Loops the list of shows\r\n    Requires no interaction between shows\r\n    Main window can be resized\r\n    Fonts are smaller\r\n\r\nFind Information at: https://sourceforge.net/projects/impressshowrunner/\r\nFind sources at: https://github.com/windyweather/ImpressShowRunnerV2\r\n\r\nReleased under GPL 3.0\r\nDarrell Duffy\r\nApril 2020");
 
 		txtHelp.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		txtHelp.setCaretPosition(0);

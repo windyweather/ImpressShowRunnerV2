@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -272,10 +273,9 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		// write the defaults file
 		saveDefaultsFile();
 		
-		// not necessary, we are closing, not closed
-		// the framework will exit for us. No need to hammer
-		// things down here.
-	    //System.exit(0);
+		// Need to exit since our base class is different
+		// from the previous version of this program.
+	    System.exit(0);
 	 
 	}
 	
@@ -345,6 +345,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			}
 			fileChooser.setAcceptAllFileFilterUsed(!isOsWindows());
 			fileChooser.setMultiSelectionEnabled(false);
+			fileChooser.setDialogTitle( "Find Impress Program");
 					
 			int result = fileChooser.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -379,6 +380,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Impress Slides", "odp"));
 			fileChooser.setAcceptAllFileFilterUsed(true);
 			fileChooser.setMultiSelectionEnabled(false);
+			fileChooser.setDialogTitle("Impress Slide Show File to Add");
 					
 			int result = fileChooser.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -416,6 +418,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Show List", "xml"));
 			fileChooser.setAcceptAllFileFilterUsed(true);
 			fileChooser.setMultiSelectionEnabled(false);
+			fileChooser.setDialogTitle("Show List File to Open");
 					
 			int result = fileChooser.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -445,6 +448,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Show List", "xml"));
 			fileChooser.setAcceptAllFileFilterUsed(true);
 			fileChooser.setMultiSelectionEnabled(false);
+			fileChooser.setDialogTitle("Save List of  Shows");
 					
 			int result = fileChooser.showSaveDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION) {
@@ -829,14 +833,23 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	        	break;
 	        }
 	        
+	        case "btnClose":{
+	        	// do as little as possible
+	        	// allow the framework to do it all
+	        	dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	break;
+	        	
+	        }
 	        case "mntmQuit": {
 	        	// do as little as possible
 	        	// allow the framework to do it all
 	        	dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	break;
 	        	
 	        }
-	        case "mntmHelpDialog": {
+	        case "mntmAbout": {
 	        	showHelpDialog();
+	        	break;
 	        }
 	        default:
 	        {
@@ -990,7 +1003,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		 */
 		public void startNextShow() {
 			String showPath = showList.get(nShowIndex);
-			
+			printSysOut("startNextShow "+showPath);
 			startShowPlaying( tfImpressPath.getText(),
 					tfOptions.getText(),
 					showPath);
@@ -998,28 +1011,71 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		}
 		
 		/*
-		 * Quote the show path in case there are spaces
-		 * Path strings should not contain quotes so this should work fine.
+		 * Build the string array of the command, options and path and clean up options
+		 * we are using an array to preserve and pass through spaces in Impress path and show path.
+		 * Also any special characters should be passed along more robustly using String[] rather
+		 * than just a string for the whole thing.
+		 */
+		public String [] buildCommandArray( String sImpress, String sOptions, String sShowPath ) {
+			
+			String [] cmdArray = {sImpress};
+			String [] cmdArray2;
+			String [] cmdArray3;
+			// leave impress path alone. Note spaces "\Program Files\" are present on Windows
+			// however, options are user-typed. So remove any extra blanks and bust up into
+			// individual strings.
+			String [] saOptions = {};
+			if ( !sOptions.isBlank() && !sOptions.isEmpty() ) {
+				
+				try {
+					saOptions = sOptions.split(" ");
+					
+				} catch ( Exception ex ) {
+					saOptions[0] = sOptions; // let user deal with the issue
+					printSysOut("buildCommandArray problem with splitting options string");
+				}
+			}
+			// add options if we have some
+			if ( saOptions.length != 0  ) {
+				// left as an exercise for the reader
+				cmdArray2 = Arrays.copyOf(cmdArray, cmdArray.length + saOptions.length);
+				System.arraycopy(saOptions, 0, cmdArray2, cmdArray.length, saOptions.length);
+			} else {
+				cmdArray2 = cmdArray;
+			}
+			// finally add the show path and leave spaces in it
+			int N = cmdArray2.length;
+			cmdArray3 = Arrays.copyOf(cmdArray2, N + 1);
+			cmdArray3[N] = sShowPath;
+			return cmdArray3;
+		}
+		
+
+		
+		/*
+		 * Build the command array to avoid problems with spaces, dashes, parens in path
 		 * Execute the command in another process.
 		 */
 		public void startShowPlaying( String sImpress, String sOptions, String sShowPath ) {
-			/*
-			 * Let's quote the path string. Double quotes may cause problems on
-			 * linux. Not clear why.
-			 */
-			String quote = "\"";
-			String quotedShowPath;
-			if ( isOsLinux() ) {
-				quote = "";
-				quotedShowPath = sShowPath.replace(" ", "\\ ");
-			} else {
-				quotedShowPath = quote +sShowPath+quote;
+
+			// for display purposes
+			String cmdString = sImpress +" "+sOptions+" "+sShowPath;
+			
+			String[] cmdArray;
+			cmdArray = buildCommandArray(sImpress, sOptions, sShowPath);
+			if ( cmdArray.length == 0 ) {
+				setStatus("No show to play");
+				printSysOut("startShowPlaying no show "+cmdString );
+				return;
 			}
-			String cmdString = sImpress +" "+sOptions+" "+quotedShowPath;
-			//String cmdAry[] = {sImpress, sOptions, quotedShowPath};
 			printSysOut("startShowPlaying command "+cmdString);
+			printSysOut("Command Array:");
+			for (String cmd : cmdArray){
+				printSysOut("|"+cmd+"|");
+				}
+			printSysOut("----");
 			try {
-				pShowProcess = Runtime.getRuntime().exec( cmdString );
+				pShowProcess = Runtime.getRuntime().exec( cmdArray );
 				printSysOut("startShowPlaying show started"+ cmdString);
 
 			} catch (Exception ex ) {
@@ -1044,6 +1100,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			}
 		
 		}
+		
 		
 		/*
 		 * Only called from timer routine if the end check does
@@ -1076,19 +1133,22 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 					// Ring the bell using the Toolkit 
 					java.awt.Toolkit.getDefaultToolkit().beep();
 				}
-				
+				printSysOut("endShow - after beep if we had one");
 				/**
 				 * just hang out until time for the next show.
 				 * Maybe someday make this more elegant, but this works for now.
 				 **/
+				printSysOut("endShow - commitEdit on spinner");
 				try {
 					spSecondsBetweenShows.commitEdit();
 				} catch ( java.text.ParseException e ) {
 					// ignore the exception if any
 				}
-				int nSecsBetweenShows = (Integer) spSecondsBetweenShows.getValue();
-				Thread.sleep(nSecsBetweenShows*1000);
 				
+				int nSecsBetweenShows = (Integer) spSecondsBetweenShows.getValue();
+				printSysOut("endShow sleeping for "+String.valueOf(nSecsBetweenShows));
+				Thread.sleep(nSecsBetweenShows*1000);
+				printSysOut("endShow - done sleeping");
 				/**
 				 * wrap the index around and start the next show
 				 */
@@ -1096,10 +1156,11 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 				if ( nShowIndex >= showList.getSize() ) {
 					nShowIndex = 0;
 				}
+				printSysOut("endShow start show at index "+String.valueOf(nShowIndex));
 				startNextShow(); // obviously, start the next show
-				
+				printSysOut("endShow show started");
 			} catch (Exception ex ) {
-				printSysOut("stopShow exception");
+				printSysOut("endShow exception "+ex.getMessage());
 				setStatus("Failed to start next show");
 				bShowRunning = false; // try to clean up
 			}
