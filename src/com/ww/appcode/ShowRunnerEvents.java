@@ -23,6 +23,7 @@ import java.util.TimerTask;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.ww.views.HelpDialog;
@@ -347,7 +348,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.setMultiSelectionEnabled(false);
 			fileChooser.setDialogTitle( "Find Impress Program");
 					
-			int result = fileChooser.showOpenDialog(this);
+			int result = fileChooser.showOpenDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    if ( selectedFile.canExecute() ) {
@@ -382,7 +383,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.setMultiSelectionEnabled(false);
 			fileChooser.setDialogTitle("Impress Slide Show File to Add");
 					
-			int result = fileChooser.showOpenDialog(this);
+			int result = fileChooser.showOpenDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    tfShowPath.setText(selectedFile.getAbsolutePath());
@@ -420,7 +421,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.setMultiSelectionEnabled(false);
 			fileChooser.setDialogTitle("Show List File to Open");
 					
-			int result = fileChooser.showOpenDialog(this);
+			int result = fileChooser.showOpenDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
 		    File selectedFile = fileChooser.getSelectedFile();
 		    printSysOut("Show List Path: " + selectedFile.getAbsolutePath());
@@ -432,6 +433,29 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			return new String(""); // empty string for nothing chosen
 		}
 		
+		/*
+		 * Ask confirm replace if file exists
+		 */
+	    protected boolean outputFileIsValid(File outputFile) {
+	        boolean fileIsValid = false;
+	        if (outputFile.exists()) {
+	            int result = JOptionPane.showConfirmDialog(
+	            		frmGuiGroupLayout,
+	                    "Replace Existing File?", "File exists",
+	                    JOptionPane.YES_NO_CANCEL_OPTION);
+	            switch (result) {
+	            case JOptionPane.YES_OPTION:
+	                fileIsValid = true;
+	                break;
+	            default:
+	                fileIsValid = false;
+	            }
+	        } else {
+	            fileIsValid = true;
+	        }
+	        return fileIsValid;
+	    }
+	
 		//
 		// Get a path to save a show list
 		//
@@ -450,16 +474,22 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.setMultiSelectionEnabled(false);
 			fileChooser.setDialogTitle("Save List of  Shows");
 					
-			int result = fileChooser.showSaveDialog(this);
+			int result = fileChooser.showSaveDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    printSysOut("Show List Path: " + selectedFile.getAbsolutePath());
 			    //setStatus("Path to show set");
 			    String savePath = selectedFile.getAbsolutePath();
-			    if (!savePath .endsWith(".xml"))
+			    if (!savePath .endsWith(".xml")) {
 			    	savePath += ".xml";
-			    return savePath;
 			    }
+			    // See if the file exists and if so, confirm replace
+			   selectedFile = new File(savePath);
+			   if ( !outputFileIsValid( selectedFile ) ) {
+				   return new String("");
+			   }
+			    return savePath;
+			}
 			else {
 				//setStatus(""); // clear status line on cancel without change
 			}
@@ -477,16 +507,14 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 				setStatus("No shows to save");
 				return;
 			}
+			setStatus("");
 			String savePath = showListSavePath();
 			if ( savePath.isEmpty() ) {
 				return;
 			}
 
 		    File saveFile = new File(savePath);
-		    if (saveFile.exists()){
 
-		    	// do we need to do anything, or did dialog do it?
-		    }
 	        Properties saveProps = new Properties(); 
 	        FileOutputStream out;
 			try {
@@ -494,6 +522,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	        }
 	        catch(IOException ex){
 	            printSysOut("saveShowList open failure " + savePath);
+	            setStatus("Show List Save failed");
 	            return;
 	        }
 
