@@ -721,6 +721,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			    }
 
 			}
+			setStatus("All shows files are present");
 			return true; // all the show file exist
 		}
 		
@@ -771,7 +772,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			} catch (Exception e ) {
 				// what can I say? We tried.
 			}
-
+			setStatus(""); // startNextShow might leave status
 			nShowIndex = 0; //start at first show
 			bShowRunning = true;
 			// start the timer and then start the next show
