@@ -350,6 +350,12 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 		mntmSaveShowList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		mnFileMenu.add(mntmSaveShowList);
 		
+		JMenuItem mntmCheckShowList = new JMenuItem("Check Show List");
+		mntmCheckShowList.setActionCommand("mntmCheckShowList");
+		mntmCheckShowList.addActionListener(this);
+		mntmCheckShowList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		mnFileMenu.add(mntmCheckShowList);
+		
 		JSeparator separator = new JSeparator();
 		mnFileMenu.add(separator);
 		

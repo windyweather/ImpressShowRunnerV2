@@ -67,10 +67,10 @@ public class HelpDialog extends JDialog {
 			contentPanel.add(lblNewLabel);
 		}
 		{
-			JLabel lblNewLabel_1 = new JLabel("Version 2.0");
+			JLabel lblNewLabel_1 = new JLabel("Version 2.1");
 			lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 			lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
-			lblNewLabel_1.setBounds(119, 49, 178, 13);
+			lblNewLabel_1.setBounds(134, 45, 178, 13);
 			contentPanel.add(lblNewLabel_1);
 		}
 		

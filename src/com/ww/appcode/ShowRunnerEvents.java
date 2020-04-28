@@ -8,6 +8,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.Robot;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -692,22 +693,63 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			setStatus("All shows removed");
 		}
 		
+		/*
+		 * check the show list to make sure all the shows exist
+		 * After a long time, LibreOffice Impress tossed an error because the show
+		 * was incorrect. Probably it was mistakenly edited manually. So now we are
+		 * going to check the list every time to make sure that all the shows are there.
+		 * And we are going to allow the show list to be checked by a menu action too.
+		 */
+		protected boolean checkShowList() {
+
+			int count = showList.size();
+			if ( count <= 0 ) {
+				setStatus("No shows in list");
+				return false;
+			}
+
+			// save all the shows to the props with unique keys
+			for ( int showIdx=0; showIdx<count; showIdx++ ) {
+
+				String showPath = showList.elementAt(showIdx);
+			    File showFile = new File(showPath);
+			    if ( !showFile.exists() ) {
+			    	// complain about missing show and select it
+			    	setStatus("Selected Show file missing");
+			    	listShows.setSelectedIndex(showIdx);
+			    	return false;
+			    }
+
+			}
+			return true; // all the show file exist
+		}
 		
+		/*
+		 * Start the shows playing after checking a few things for sanity
+		 */
 		protected void startShows()
 		{
-			/**
+			/*
 			 * if there are shows, then set the index, mark shows running
 			 * 
 			 */
 			setStatus(""); // we can check for errors now
 			if ( bShowRunning )
 			{
-				setStatus("Shows are running");
+				setStatus("Shows are already running");
 				return;
 			}
 			if ( showList.isEmpty() )
 			{
 				setStatus("No shows in list");
+				return;
+			}
+			
+			/*
+			 * Make sure all the show files exist
+			 * and set status and select bad file.
+			 */
+			if ( !checkShowList() ) {
 				return;
 			}
 			
@@ -730,7 +772,6 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 				// what can I say? We tried.
 			}
 
-			
 			nShowIndex = 0; //start at first show
 			bShowRunning = true;
 			// start the timer and then start the next show
@@ -752,6 +793,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 				//return;
 			}
 			bShowRunning = false;
+			stopTimer(); // stop it again after show not running.
 			setStatus("Hit ESC to end current show");
 			
 			try {
@@ -766,11 +808,14 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			setStatus("Shows stopped");
 		}
 		
-		
+		/*
+		 * Help does not center on main dialog and I'm passing a part of that
+		 * So at this point I have no clue why it's not working. Future TBD.
+		 */
 		protected void showHelpDialog()
 		{
-			 printSysOut( "ShowRunnerEvents::showHelpDialog" );
-			HelpDialog dlg = new HelpDialog( new JFrame(), "no title here", true);
+			printSysOut( "ShowRunnerEvents::showHelpDialog" );
+			HelpDialog dlg = new HelpDialog( frmGuiGroupLayout, "no title here", true);
 			dlg.setVisible(true);
 		}
 		
@@ -853,6 +898,13 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	        	saveShowList();
 	        	break;
 	        }
+	        case "mntmCheckShowList": {
+	        	boolean bShowListOk = checkShowList();
+	        	if (bShowListOk) {
+	        		break; // same either way, but don't go UnReferenced ;)
+	        	}
+	        	break;
+	        }
 	        case "mntmSaveDefaults": {
 	        	saveDefaultsFile();
 	        	break;
@@ -891,11 +943,11 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	/**
 	 * mntmOpenShowList
 	 * mntmSaveShowList
+	 * mntmCheckShowList
 	 * mntmSaveDefaults
 	 * mntmRestoreDefaults
 	 * mntmQuit
-	 * mntmHelpDialog
-	 * mntmAboutDialog
+	 * mntmAbout
 	 * btnBrowseForImpress
 	 * btnBrowseForShow
 	 * btnAddShow
@@ -916,7 +968,8 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			@Override
 			public void run() {
 				// if done with timers, stop us
-				if ( !bTimerRunning ) {
+				if ( !bTimerRunning || !bShowRunning) {
+					bTimerRunning = false;
 					// absolutely stop us
 					this.cancel();
 					return;
