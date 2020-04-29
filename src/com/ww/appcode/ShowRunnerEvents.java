@@ -3,11 +3,14 @@
  */
 package com.ww.appcode;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
+import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -201,6 +204,36 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
             return;
         }
         
+
+		// Restore our size and position on the screen
+		// Make sure the defaults are somewhere on this screen before we
+		// move our window there
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle rect = new Rectangle();
+		
+		// Integer might toss exceptions if there are no properties
+		try {
+			rect.x = Integer.valueOf(defProps.getProperty("WindowX" ) );
+			rect.y = Integer.valueOf(defProps.getProperty("WindowY" ) );
+			rect.width = Integer.valueOf(defProps.getProperty("WindowWidth" ) );
+			rect.height = Integer.valueOf(defProps.getProperty("WindowHeight" ) );
+			
+			/*
+			 * do some sanity checking before we move the window and size it
+			 */
+			boolean badBounds = false;
+			if ( rect.x <= 0 || rect.y <= 0 || 
+					rect.width < 400 || rect.height < 400 || (rect.x + rect.width) > screenSize.width || 
+					(rect.y + rect.height) > screenSize.height ) {
+				badBounds = true;
+			}
+			if ( !badBounds   ) {
+				frmGuiGroupLayout.setBounds( rect );
+			}
+		} catch ( Exception ex ) {
+			// just ignore the exception and not set the bounds
+		}
+		
         String sImpressPath = defProps.getProperty("ImpressPath");
         String sImpressOptions = defProps.getProperty("ImpressOptions");
         String sShowPath = defProps.getProperty("ShowPath");
@@ -214,7 +247,6 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
         if ( 0 != sShowPath.length() ) {
         	tfShowPath.setText( sShowPath );
         }
-        
 
         printSysOut("restoreDefaultsFile "+defaultsFile);
         defProps.list(System.out); 
@@ -247,6 +279,13 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
             printSysOut("saveDefaultsFile open failure " + defaultsFile);
             return;
         }
+		// save where we are and our size on the screen.
+		Rectangle rect = frmGuiGroupLayout.getBounds();
+		
+		defProps.put("WindowX", String.valueOf(rect.x) );
+		defProps.put("WindowY", String.valueOf(rect.y) );
+		defProps.put("WindowWidth", String.valueOf(rect.width) );
+		defProps.put("WindowHeight", String.valueOf(rect.height) );
 
         defProps.put("ImpressPath", tfImpressPath.getText() ); 
         defProps.put("ImpressOptions", tfOptions.getText() ); 
