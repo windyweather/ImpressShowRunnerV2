@@ -54,7 +54,9 @@ public class HelpDialog extends JDialog {
 		setFont(new Font("Dialog", Font.PLAIN, 16));
 		
 		setTitle("About ImpressShowRunner");
-		setBounds(100, 100, 450, 507);
+
+		// respect the position of the base dialog
+		setBounds(mf.getX(), mf.getY(), 450, 507);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
