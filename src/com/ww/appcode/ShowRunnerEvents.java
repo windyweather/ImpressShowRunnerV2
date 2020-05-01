@@ -15,6 +15,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,7 +70,18 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 				public void run() {
 					try {
 						ShowRunnerEvents window = new ShowRunnerEvents();
-						window.frmGuiGroupLayout.setVisible(true);
+						frmGuiGroupLayout.setVisible(true);
+						
+						// add a window closing listener to catch the [X] button
+						frmGuiGroupLayout.addWindowListener(new WindowAdapter() {
+							@Override
+							public void windowClosing(WindowEvent e) {
+								System.out.println( "frmGuiGroupLayout windowClosing" );
+								// call a method to save our stuff
+								window.closeOurApplication();
+							}
+						});
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -121,7 +133,21 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		private void printSysOut( String str ) {
 			System.out.println(str);
 		}
-
+		/*
+		 * close down our app. Save whatever we need to on the way out.
+		 * This scheme catches the [X] button in the window title bar.
+		 */
+		public void closeOurApplication()
+		{
+			printSysOut( "ShowRunnerEvents closeOurApplication - save your stuff here" );
+			// write the defaults file
+			saveDefaultsFile();
+			
+			// Need to exit since our base class is different
+			// from the previous version of this program.
+		    System.exit(0);
+		}
+		
 	/**
 	 * Class Constructor
 	 */
@@ -311,12 +337,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	public void windowClosingEvent(WindowEvent e) {
 		
 		printSysOut( "windowClosing - save your stuff here" );
-		// write the defaults file
-		saveDefaultsFile();
-		
-		// Need to exit since our base class is different
-		// from the previous version of this program.
-	    System.exit(0);
+		closeOurApplication();
 	 
 	}
 	
@@ -957,14 +978,16 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 	        case "btnClose":{
 	        	// do as little as possible
 	        	// allow the framework to do it all
-	        	dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	//dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	closeOurApplication();
 	        	break;
 	        	
 	        }
 	        case "mntmQuit": {
 	        	// do as little as possible
 	        	// allow the framework to do it all
-	        	dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	//dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	        	closeOurApplication();
 	        	break;
 	        	
 	        }

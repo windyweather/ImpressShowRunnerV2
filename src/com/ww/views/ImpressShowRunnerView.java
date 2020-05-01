@@ -33,7 +33,7 @@ import javax.swing.JSeparator;
 import java.awt.Font;
 import javax.swing.JFrame;
 
-public abstract class ImpressShowRunnerView extends JFrame implements ActionListener{
+public abstract class ImpressShowRunnerView implements ActionListener{
 
 	// get rid of a warning about serialization.
 	private static final long serialVersionUID = 19837502L;
@@ -47,7 +47,7 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 	protected DefaultListModel<String>showList = new DefaultListModel<String>();
 	protected JList<String> listShows = new JList<String>(showList);
 	
-	public JFrame frmGuiGroupLayout;
+	static public JFrame frmGuiGroupLayout;
 	protected JTextField tfImpressPath;
 	protected JTextField tfOptions;
 	protected JTextField tfShowPath;
@@ -76,33 +76,19 @@ public abstract class ImpressShowRunnerView extends JFrame implements ActionList
 */
 	
 	
-	// we will overload this in the child class
-	// use the same one for every action
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-	    System.out.println( "FirstWbGui::actionPerformed "+actionCommand );
-	}
-	
-	// catch window closing with our own method
-	// this is overridden in the child to save stuff before exit
-	public void windowClosingEvent(WindowEvent e) {
-		System.out.println( "FirstWbGui windowClosing" );
-	}
-	
-	
 	/**
 	 * Create the application.
 	 */
 	public ImpressShowRunnerView() {
 		initialize();
 		
-		addWindowListener(new WindowAdapter() {
+		frmGuiGroupLayout.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				System.out.println( "frmGuiGroupLayout windowClosing" );
 				// Find ourselves in the great beyond
-				ImpressShowRunnerView win = (ImpressShowRunnerView)e.getWindow();
-				win.windowClosingEvent(e); // call us, which will call our child too
+				//ImpressShowRunnerView win = (ImpressShowRunnerView)e.getWindow();
+				//win.windowClosingEvent(e); // call us, which will call our child too
 			}
 		});
 		
