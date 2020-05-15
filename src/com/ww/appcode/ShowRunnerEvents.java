@@ -427,7 +427,7 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 		}
 		
 		//
-		// Browse for a .xml file that contains the list of shows to play.
+		// Browse for an impress file to add to list of shows to play
 		//
 		protected void browseForShowToAdd()
 		{
@@ -442,25 +442,71 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Impress Slides", "odp"));
 			fileChooser.setAcceptAllFileFilterUsed(true);
 			fileChooser.setMultiSelectionEnabled(false);
-			fileChooser.setDialogTitle("Impress Slide Show File to Add");
+			fileChooser.setDialogTitle("Impress Slide Show Folder");
 					
 			int result = fileChooser.showOpenDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    tfShowPath.setText(selectedFile.getAbsolutePath());
 			    printSysOut("Show File Path: " + selectedFile.getAbsolutePath());
-			    setStatus("Path to show set");
+			    setStatus("Path to shows set");
+			    }
+			else {
+				setStatus(""); // clear status line on cancel without change
+			}
+		}
+
+		//
+		// Browse for one or more shows to add to the list
+		//
+		protected void browseForShowsToAdd()
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			File defDir;
+			
+			// start with a possibly empty path to a show we looked at.
+			String path = getReasonablePath(tfShowPath.getText());
+			// point fileChooser at a carefully chosen default
+			defDir = new File(path);
+			fileChooser.setCurrentDirectory(defDir);
+			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Impress Slides", "odp"));
+			fileChooser.setAcceptAllFileFilterUsed(true);
+			fileChooser.setMultiSelectionEnabled(true);
+			fileChooser.setDialogTitle("Impress Slide Show Files to Add");
+			
+			/*
+			 * Move the dialog over so we can see the list
+			 * does not work.
+			Rectangle bounds = frmGuiGroupLayout.getBounds();
+			bounds.x = bounds.x+bounds.width;
+			fileChooser.setBounds(bounds);
+			*/
+					
+			int result = fileChooser.showOpenDialog(null);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File[] filesToAdd = fileChooser.getSelectedFiles();
+				for (File fileToAdd : filesToAdd){
+					showList.addElement(fileToAdd.getAbsolutePath());
+					}
+				int nFiles = filesToAdd.length;
+			    printSysOut("Shows added to list: " + String.valueOf(nFiles));
+			    setStatus(String.valueOf(nFiles)+ " Shows added to list");
 			    }
 			else {
 				setStatus(""); // clear status line on cancel without change
 			}
 		}
 		
-		protected void addShowToList()
-		{
+		/*
+		 * Add one or more shows to the list of shows
+		 */
+		protected void addShowToList() {
+			browseForShowsToAdd();
+			/*
 			String showPath = tfShowPath.getText();
 			showList.addElement(showPath);
 			setStatus("Show added");
+			*/
 		}
 		
 		

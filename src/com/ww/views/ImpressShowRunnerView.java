@@ -124,7 +124,7 @@ public abstract class ImpressShowRunnerView implements ActionListener{
 		btnBrowseForImpress.addActionListener(this);
 		btnBrowseForImpress.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
-		JButton btnAddShow = new JButton("Add Show");
+		JButton btnAddShow = new JButton("Add Shows");
 		btnAddShow.setActionCommand("btnAddShow");
 		btnAddShow.addActionListener(this);
 		btnAddShow.setFont(new Font("Tahoma", Font.PLAIN, 14));
