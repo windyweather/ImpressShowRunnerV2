@@ -482,8 +482,12 @@ public class ShowRunnerEvents extends ImpressShowRunnerView implements ActionLis
 			fileChooser.setBounds(bounds);
 			*/
 					
-			int result = fileChooser.showOpenDialog(null);
+			int result = fileChooser.showOpenDialog(frmGuiGroupLayout);
 			if (result == JFileChooser.APPROVE_OPTION) {
+				
+			    File selectedFile = fileChooser.getSelectedFile();
+			    tfShowPath.setText(selectedFile.getAbsolutePath());
+
 				File[] filesToAdd = fileChooser.getSelectedFiles();
 				for (File fileToAdd : filesToAdd){
 					showList.addElement(fileToAdd.getAbsolutePath());
